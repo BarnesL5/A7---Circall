@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circall — One circle for everyday life</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Circall</h1>
+    <p class="tagline">No surprises. No awkward asking.</p>
+    <p class="intro">
+      One circle for a family or group: schedules, a help board, chat,
+      check-ins, Stories, goals, and a simple money log — so you ask the
+      circle, not one person.
+    </p>
+  </header>
+
+  <!-- FIRST SCREEN: create your own circle from scratch.
+       Nothing is pre-filled — no sample family, no sample data.
+       This screen shows on first load, until you create a circle. -->
+  <main id="setupScreen" class="setup">
+    <div class="card setup-card">
+      <h2>Create your circle</h2>
+      <p class="hint">
+        Start empty. Give your circle a name, say what kind it is,
+        and add yourself first — then invite your people.
+      </p>
+      <form id="setupForm">
+        <label>
+          Circle name
+          <input id="setupCircleName" type="text" placeholder="e.g. The Barnes Family" required>
+        </label>
+        <label>
+          Kind of circle
+          <select id="setupKind">
+            <option value="Family">Family</option>
+            <option value="Group">Group / organization</option>
+          </select>
+        </label>
+        <label>
+          Your name
+          <input id="setupYourName" type="text" placeholder="e.g. LaMarion" required>
+        </label>
+        <button type="submit">Create my circle</button>
+      </form>
+      <p class="small">
+        Saved only on this device / browser for now (localStorage).
+        Each visitor starts with their own empty circle — nothing is shared yet.
+        Google login is the next step; see README.md.
+      </p>
+    </div>
+  </main>
+
+  <!-- THE APP: hidden until a circle exists. -->
+  <div id="appScreen" hidden>
+    <div class="circle-bar">
+      <p><strong id="circleTitle"></strong> <span id="circleKind" class="small"></span></p>
+      <p><strong>Signed in as:</strong> <span id="whoami"></span> <span class="small">(local profile — no real account yet)</span></p>
+      <!-- Google login is the NEXT step, not in this version.
+           See AUTH_CONFIG in app.js and the README for what is needed. -->
+      <button id="googleBtn" type="button" disabled title="Google login is not wired up in this version">
+        Sign in with Google (coming next)
+      </button>
+      <div class="actions">
+        <button id="freshBtn" type="button">Delete circle &amp; start over</button>
+      </div>
+    </div>
+
+    <!-- Tabs: one button per view. app.js switches which section shows. -->
+    <nav class="tabs" aria-label="Circall sections">
+      <button type="button" data-tab="circle" class="active">Circle</button>
+      <button type="button" data-tab="availability">Availability</button>
+      <button type="button" data-tab="help">Help Board <span id="helpBadge" class="badge"></span></button>
+      <button type="button" data-tab="chat">Chat</button>
+      <button type="button" data-tab="checkins">Check-ins &amp; Stories</button>
+      <button type="button" data-tab="money">Money</button>
+      <button type="button" data-tab="goals">Goals</button>
+    </nav>
+
+    <main>
+      <!-- 1. CIRCLE / MEMBERS -->
+      <section id="tab-circle" class="tab active">
+        <h2>Your circle</h2>
+        <p class="hint">
+          The creator invites people and sets a role. Each person chooses
+          what to share in this circle — they can turn any toggle off.
+        </p>
+        <div id="members"></div>
+
+        <h3>Add a member</h3>
+        <p class="small">No real invite is sent yet — adding a member adds them to this circle right away, on this device.</p>
+        <form id="inviteForm">
+          <input id="inviteName" type="text" placeholder="Name, e.g. Jordan" required>
+          <select id="inviteRole">
+            <option>Adult</option>
+            <option>Child</option>
+            <option>Leader</option>
+            <option>Supervisor</option>
+            <option>Host</option>
+            <option>Member</option>
+          </select>
+          <button type="submit">Add to circle</button>
+        </form>
+      </section>
+
+      <!-- 2. AVAILABILITY -->
+      <section id="tab-availability" class="tab">
+        <h2>Shared availability</h2>
+        <p class="hint">Who is free when — so plans don't need 20 messages to figure out.</p>
+        <div id="availability"></div>
+        <h3>Add availability</h3>
+        <form id="availForm">
+          <input id="availWho" type="text" placeholder="Who?" required>
+          <input id="availWhen" type="text" placeholder="When? e.g. Sat 9–11am" required>
+          <input id="availNote" type="text" placeholder="Note, e.g. Free for pickup">
+          <button type="submit">Add</button>
+        </form>
+      </section>
+
+      <!-- 3. HELP BOARD -->
+      <section id="tab-help" class="tab">
+        <h2>Help Board</h2>
+        <p class="hint">Ask the circle, not a person. Post a need, split it into parts, and anyone can claim a part.</p>
+        <div id="helpBoard"></div>
+        <h3>Post a need</h3>
+        <form id="helpForm">
+          <input id="helpTitle" type="text" placeholder="What do you need? e.g. Help with Saturday shop" required>
+          <input id="helpWho" type="text" placeholder="Who needs it?" required>
+          <input id="helpParts" type="text" placeholder="Parts, separated by commas: buy, collect, deliver" required>
+          <button type="submit">Post need</button>
+        </form>
+      </section>
+
+      <!-- 4. CHAT -->
+      <section id="tab-chat" class="tab">
+        <h2>Circle chat</h2>
+        <p class="hint">Chat for this circle only.</p>
+        <div id="chatLog" class="chat-log"></div>
+        <form id="chatForm">
+          <input id="chatInput" type="text" placeholder="Message the circle…" required>
+          <button type="submit">Send</button>
+        </form>
+      </section>
+
+      <!-- 5. CHECK-INS + STORIES -->
+      <section id="tab-checkins" class="tab">
+        <h2>Check-ins</h2>
+        <p class="hint">Location as a check-in — “I’m at…” — not 24/7 tracking.</p>
+        <div id="checkins"></div>
+        <form id="checkinForm">
+          <input id="checkinWhere" type="text" placeholder="I'm at… e.g. the store" required>
+          <button type="submit">Check in</button>
+        </form>
+
+        <h2>Stories</h2>
+        <p class="hint">Casual text updates to the circle. Photo / video upload is not in this version yet.</p>
+        <div id="stories"></div>
+        <form id="storyForm">
+          <input id="storyInput" type="text" placeholder="Share a quick update…" required>
+          <button type="submit">Post Story</button>
+        </form>
+      </section>
+
+      <!-- 6. MONEY -->
+      <section id="tab-money" class="tab">
+        <h2>Money log</h2>
+        <p class="hint">A simple shared log / split. No bank connections in v1.</p>
+        <div id="moneySummary"></div>
+        <div id="moneyLog"></div>
+        <h3>Add an expense</h3>
+        <form id="moneyForm">
+          <input id="moneyWhat" type="text" placeholder="What? e.g. Groceries" required>
+          <input id="moneyAmount" type="number" step="0.01" min="0" placeholder="Amount ($)" required>
+          <input id="moneyWho" type="text" placeholder="Paid by?" required>
+          <button type="submit">Add</button>
+        </form>
+      </section>
+
+      <!-- 7. GOALS -->
+      <section id="tab-goals" class="tab">
+        <h2>Goals</h2>
+        <p class="hint">Things the circle hopes to achieve, together.</p>
+        <div id="goals"></div>
+        <h3>Add a goal</h3>
+        <form id="goalForm">
+          <input id="goalTitle" type="text" placeholder="Goal, e.g. Save for a family outing" required>
+          <input id="goalTarget" type="number" min="1" placeholder="Target (number)" required>
+          <button type="submit">Add goal</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p class="small">
+      Circall is a provisional working name. No real accounts, no shared
+      data, no real invites yet. See README.md for hosting and the
+      Google login next step.
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
