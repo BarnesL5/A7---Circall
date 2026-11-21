@@ -41,6 +41,20 @@ body {
 .circle-bar p { margin: 4px 0; }
 .circle-bar button[disabled] { opacity: 0.65; cursor: not-allowed; }
 
+/* Shared vs on-this-device-only badge in the app header. */
+.mode-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-left: 6px;
+}
+.mode-badge.mode-local { background: #e6e2d8; color: #555; }
+.mode-badge.mode-shared { background: #2e7d5b; color: #fff; }
+
+#inviteCodeBox { font-size: 0.95rem; }
+
 main { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
 
 .tabs {

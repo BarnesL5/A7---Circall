@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// Circall — Firestore security rules (starter rules, NOT production-secure)
+// ---------------------------------------------------------------------------
+// What this file is:
+//   The rules for the "circles" collection in Firestore. They decide who
+//   can read and write a shared circle.
+//
+// What these rules do right now:
+//   Any signed-in user (request.auth != null) can read and write any
+//   circle document. That is enough to get sharing working for a small
+//   test with people you trust, and to stop strangers with no account
+//   from reading your circles.
+//
+// What they do NOT do:
+//   They do NOT check that you are actually a member of a circle.
+//   A signed-in user who guesses (or is given) a circle document id
+//   could read or change that circle. Do NOT call this production-secure.
+//
+// Before real family use, tighten the rules to members-only, for example:
+//   allow read, write: if request.auth != null
+//     && request.auth.uid in resource.data.membersUids;
+//   (that needs a membersUids array on each circle document listing
+//   the Google user ids of its members — not built yet.)
+//
+// How to publish these rules:
+//   Option A — Firebase Console (easiest, no install):
+//     1. Go to Firebase Console > Build > Firestore Database.
+//     2. Open the "Rules" tab.
+//     3. Paste the contents of this file, then click Publish.
+//   Option B — Firebase CLI:
+//     1. Install the CLI and run "firebase init firestore" in this folder.
+//     2. Run "firebase deploy --only firestore:rules".
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // One document per circle, in the "circles" collection.
+    match /circles/{circleId} {
+      // Signed-in users only. No anonymous / signed-out access.
+      allow read, write: if request.auth != null;
+    }
+    // Everything else: deny by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -10,10 +10,11 @@ a host. Here are the three sensible options, in the order to try them.
 - **What it is:** GitHub hosts your static files and gives you a link.
 - **Good for:** sharing this version right away, so people can open it,
   create their own circle, and try it.
-- **Limit:** static only. No shared data, no login, no backend. Each
+- **Limit:** static hosting only. If you do not sign in, each
   visitor gets their own empty circle in their own browser
-  (localStorage). That is a limit of this version of the app, not a
-  mistake in the hosting.
+  (localStorage). Shared circles work from this same link, but only
+  after the Firestore database has been created in Firebase Console
+  (see README.md, “Shared circles”) and everyone signs in with Google.
 - **Link looks like:** `https://BarnesL5.github.io/A7---Circall/`
 
 ### Steps (GitHub Pages)
@@ -46,25 +47,27 @@ a host. Here are the three sensible options, in the order to try them.
 
 - **Cost:** free tier (Spark plan) covers getting started.
 - **What it is:** Google’s hosting + login + database, in one place.
-  This is the recommended path for the **next step** in the README:
-  real Google sign-in, so the circle is shared between the people
-  in it instead of living in each person’s browser.
+  Google login is already wired in; Firestore shared circles are
+  already in the code (`app.js` + `firestore.rules`) — what is left
+  is creating the database in Firebase Console (see README.md).
 - **Good for:** Google login, a shared database (Firestore), and
   hosting — all under one Google Cloud / Firebase project.
 - **Needs:** a Firebase project (free to create), Google sign-in
-  turned on in Firebase Authentication, and a Firebase config
-  (including a client ID) pasted into `AUTH_CONFIG` in `app.js`.
+  turned on in Firebase Authentication, a Firestore database created
+  in that project, and the rules in `firestore.rules` published.
   No real credentials are in this project — you create your own.
 - **When to use it:** after the GitHub Pages demo link has been
   shared and tried. Move to Firebase when you want real accounts
-  and shared circles.
+  and shared circles. You can also keep GitHub Pages as the host
+  and just use Firebase for login + database — that is how the app
+  is set up now.
 
 ## Recommendation
 
 1. **Now:** GitHub Pages — share the link, let people create their
    own circle and try it.
-2. **Next:** Firebase Hosting + Authentication — add Google login
-   and a shared database, so a circle is truly shared.
+2. **Next:** Firebase — create the Firestore database and publish
+   `firestore.rules`, so a circle is truly shared.
 3. **Later, only if needed:** Vercel/Netlify if you outgrow the
    above or want server functions for invites/notifications.
 

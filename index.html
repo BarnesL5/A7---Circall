@@ -43,14 +43,44 @@
           Your name
           <input id="setupYourName" type="text" placeholder="Your name" required>
         </label>
-        <button type="submit">Create my circle</button>
+        <button type="submit">Create my circle (on this device only)</button>
       </form>
       <p class="small">Or sign up / sign in with Google first — your Google name will fill in below.</p>
       <button id="googleBtnSetup" type="button">Sign in with Google</button>
+    </div>
+
+    <div class="card setup-card">
+      <h2>Share with your family / group</h2>
+      <p class="hint">
+        A shared circle lives in Firestore, so everyone who joins it
+        sees the same members, help board, chat and money — live.
+        Everyone signs in with Google.
+      </p>
       <p class="small">
-        Saved only on this device / browser for now (localStorage).
-        Each visitor starts with their own empty circle — nothing is shared yet.
-        You can sign in with Google once your circle is created — see the button in the app header.
+        Fill in the circle name, kind and your name above, then tap
+        “Create a shared circle”. You will get an invite code to share.
+      </p>
+      <button id="createSharedBtn" type="button">Create a shared circle</button>
+      <p id="sharedMsg" class="small"></p>
+
+      <h3>Join a shared circle</h3>
+      <p class="hint">Got an invite code from someone in the circle? Enter it here.</p>
+      <form id="joinForm">
+        <input id="joinCode" type="text" placeholder="Invite code, e.g. ABC123" required>
+        <input id="joinName" type="text" placeholder="Your name" required>
+        <button type="submit">Join a shared circle</button>
+      </form>
+      <p id="joinMsg" class="small"></p>
+    </div>
+
+    <div class="card setup-card">
+      <p class="small">
+        <strong>On this device only</strong> means the circle is saved
+        in this browser only (localStorage). Nobody else sees it.
+        <strong>Shared</strong> means it is saved in Firestore and
+        everyone who joins with the invite code sees the same circle.
+        If you are not signed in, or Firestore is not set up yet,
+        the app falls back to “on this device only”.
       </p>
     </div>
   </main>
@@ -58,13 +88,18 @@
   <!-- THE APP: hidden until a circle exists. -->
   <div id="appScreen" hidden>
     <div class="circle-bar">
-      <p><strong id="circleTitle"></strong> <span id="circleKind" class="small"></span></p>
+      <p><strong id="circleTitle"></strong> <span id="circleKind" class="small"></span> <span id="modeBadge" class="mode-badge mode-local">On this device only</span></p>
+      <p id="inviteCodeBox" class="small" hidden>Invite code: <strong id="inviteCodeText"></strong> <button id="copyInviteBtn" type="button" class="small-btn">Copy invite code</button></p>
+      <p id="modeNote" class="small">Saved in this browser only. Sign in with Google to share this circle.</p>
       <p><strong>Signed in as:</strong> <span id="whoami"></span> <span id="authStatus" class="small">(local profile — sign in with Google to use your Google account)</span></p>
       <button id="googleBtn" type="button">
         Sign in with Google
       </button>
       <button id="signOutBtn" type="button" hidden>
         Sign out
+      </button>
+      <button id="shareLocalBtn" type="button" hidden>
+        Share this circle
       </button>
       <div class="actions">
         <button id="freshBtn" type="button">Delete circle &amp; start over</button>
@@ -93,7 +128,7 @@
         <div id="members"></div>
 
         <h3>Add a member</h3>
-        <p class="small">No real invite is sent yet — adding a member adds them to this circle right away, on this device.</p>
+        <p class="small" id="inviteHint">No real invite is sent yet — adding a member adds them to this circle right away, on this device.</p>
         <form id="inviteForm">
           <input id="inviteName" type="text" placeholder="Name, e.g. Jordan" required>
           <select id="inviteRole">
@@ -199,14 +234,16 @@
   <footer>
     <p class="small">
       Circall is a provisional working name. Google sign-in is wired to
-      the Firebase project for this app. Data is still saved per-browser
-      for now — shared circles need Firestore next. See README.md.
+      the Firebase project for this app. Shared circles use Firestore —
+      see README.md. If you are not signed in, or Firestore is not set
+      up yet, the app saves on this device only.
     </p>
   </footer>
 
-  <!-- Firebase (compat SDK, no build step) for Google sign-in -->
+  <!-- Firebase (compat SDK, no build step) for Google sign-in + Firestore -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

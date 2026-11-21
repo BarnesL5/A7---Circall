@@ -53,7 +53,10 @@ local files — if anything looks off, use Option 2.
 3. Right-click `index.html` → **Open with Live Server**.
 
 Your circle is saved in your browser (localStorage), so it is still
-there when you come back on the same device and browser.
+there when you come back on the same device and browser. If you
+sign in with Google and use a shared circle, that circle is also
+saved in Firestore — but only after the database has been created
+in Firebase Console (see “Shared circles” below).
 
 ## How to share it — hosting (free)
 
@@ -69,12 +72,15 @@ The easiest way to share a link is **GitHub Pages** — see
    `https://BarnesL5.github.io/A7---Circall/`
 
 **Important — what the hosted version is and isn’t:**
-- It is a **demo webapp**. Each visitor starts with their own empty
-  circle, saved only in their own browser.
-- There is **no shared data** yet: if you add a member or post a need,
-  nobody else sees it. Google sign-in is wired in (see below), but
-  circles are still per-browser until Firestore is added.
-- No real invites are sent — adding a member adds them on that device only.
+- It is a **demo webapp**. If you do **not** sign in, each visitor
+  starts with their own empty circle, saved only in their own browser.
+- If you **do** sign in with Google and create or join a **shared**
+  circle, that circle lives in Firestore and everyone who joins it
+  with the invite code sees the same members, help board, chat and
+  money, live.
+- No real invites are sent by email — you share the 6-character
+  invite code yourself, and the other person signs in with Google
+  and joins with that code.
 
 ## Google login — wired in
 
@@ -95,38 +101,78 @@ using Firebase Authentication (Google provider).
 - In Firebase Console, **Authentication → Sign-in method → Google**
   must stay enabled.
 
-Shared circles are still the next step: add Firestore (Firebase
-database) so circles, members, help requests, chat, and money are
-shared instead of living in each person’s browser alone.
+## Shared circles — now in the app (Firestore)
 
-## Next step: shared data with Firestore
+A shared circle is one document in Firestore, in the `circles`
+collection. One document holds the whole circle: name, kind, owner,
+invite code, members, availability, help requests, chat, check-ins,
+Stories, money, goals and `nextId`. When anyone in the circle makes
+a change, the app saves it to Firestore and everyone else sees it
+live (the app listens with `onSnapshot`).
 
-To turn this into a real shared webapp — one circle that everyone in
-it can actually see — add Firestore in the same Firebase project,
-then move the localStorage save/load in `app.js` to read/write that
-circle in Firestore, keyed by the signed-in user.
+**Before sharing works, create the database (once, in the Console):**
 
-Alternative: Google Identity Services (Sign in with Google button)
-plus your own backend/database. Firebase is recommended first
-because hosting + login + database come as one package — see
-[HOSTING.md](HOSTING.md).
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+   and open the project `a7---circall`.
+2. Go to **Build → Firestore Database**.
+3. Click **Create database**.
+4. When it asks, choose **Start in test mode** for now (the rules
+   in `firestore.rules` below tighten this to signed-in users only).
+5. Pick a region close to you (for example `nam5 (United States)`),
+   then click **Enable**. The database is free to start.
+
+**Publish the security rules:**
+
+- Easiest way (no install): in Firestore Database, open the
+  **Rules** tab, paste the contents of `firestore.rules` from this
+  folder, and click **Publish**.
+- Or with the Firebase CLI: `firebase deploy --only firestore:rules`.
+
+The rules in `firestore.rules` allow read/write only for signed-in
+users (`request.auth != null`). That is a starter rule — it is **not**
+production-secure, because it does not check that you are a member
+of that circle. Before real family use, tighten it to members-only
+(see the comments in `firestore.rules`).
+
+**How sharing works, in plain terms:**
+
+1. Sign in with Google.
+2. On the setup screen, fill in the circle name, kind and your name,
+   then tap **Create a shared circle**. You get a 6-character invite
+   code — share it with your people.
+3. They open the same link, sign in with Google, and on the setup
+   screen tap **Join a shared circle** with that code and their name.
+4. From then on, everyone in that circle sees the same thing, live.
+   The header shows **Shared** and the invite code, with a Copy button.
+5. Already have a local-only circle? Open it, sign in, and tap
+   **Share this circle** in the header. It uploads that circle to
+   Firestore and switches you to shared mode.
+6. If you are not signed in, or Firestore is not set up yet, the app
+   falls back to **On this device only** (localStorage) and says so
+   in the header.
+
+No sample data is seeded — every circle starts empty.
 
 ## Project layout
 
 ```text
-index.html   — the page: setup screen, tabs, and all the forms
-styles.css   — all the styling, no framework
-app.js       — all the logic: create circle, members, help board,
-               chat, check-ins, Stories, money, goals; saved in
-               localStorage under the key "circall-webapp-v1"
-README.md    — this file
-HOSTING.md   — hosting comparison + GitHub Pages steps
+index.html      — the page: setup screen, tabs, and all the forms
+styles.css      — all the styling, no framework
+app.js          — all the logic: create/join/share circles, members,
+                  help board, chat, check-ins, Stories, money, goals;
+                  shared circles in Firestore, local-only circles in
+                  localStorage under the key "circall-webapp-v1"
+firestore.rules — Firestore security rules (signed-in users only;
+                  see the comments in the file before real family use)
+README.md       — this file
+HOSTING.md      — hosting comparison + GitHub Pages steps
 ```
 
 ## What’s NOT done yet
 
-- Shared backend / database (Firestore) — Google sign-in is wired in,
-  but data is per-browser only for now.
-- Real invites (email / link) — adding a member is local-only.
+- Members-only Firestore rules — the rules now allow any signed-in
+  user, not just members of that circle (see `firestore.rules`).
+- Real invites (email / link) — you share the 6-character invite
+  code yourself; adding a member without the code is local-only.
 - Photo/video Stories — text updates only in this version.
 - No mobile app — this is a webapp on purpose, before any app work.
