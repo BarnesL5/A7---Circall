@@ -72,42 +72,39 @@ The easiest way to share a link is **GitHub Pages** — see
 - It is a **demo webapp**. Each visitor starts with their own empty
   circle, saved only in their own browser.
 - There is **no shared data** yet: if you add a member or post a need,
-  nobody else sees it. There are **no real accounts** yet, and no real
-  invites are sent — adding a member adds them on that device only.
-- That is expected at this stage. Shared data + real accounts is the
-  next step, below.
+  nobody else sees it. Google sign-in is wired in (see below), but
+  circles are still per-browser until Firestore is added.
+- No real invites are sent — adding a member adds them on that device only.
 
-## Next step: a real webapp with Google login
+## Google login — wired in
+
+Google sign-in is wired to the Firebase project `a7---circall`
+using Firebase Authentication (Google provider).
+
+- The “Sign in with Google” button is on the setup screen and in the
+  app header. Signing in fills in your name and shows you as signed
+  in with Google. Sign out is in the app header.
+- The Firebase web config lives in `app.js` (`firebaseConfig`). That
+  is the public web config for a browser app — it is meant to be in
+  client code. **Never commit a private key or service-account file.**
+- **One step left in Firebase Console, or sign-in will fail:**
+  go to **Authentication → Settings → Authorized domains** and add
+  your hosting domain, e.g. `BarnesL5.github.io`, plus `localhost`
+  for local testing. Firebase only allows sign-in from domains on
+  that list.
+- In Firebase Console, **Authentication → Sign-in method → Google**
+  must stay enabled.
+
+Shared circles are still the next step: add Firestore (Firebase
+database) so circles, members, help requests, chat, and money are
+shared instead of living in each person’s browser alone.
+
+## Next step: shared data with Firestore
 
 To turn this into a real shared webapp — one circle that everyone in
-it can actually see, with Google sign-in — you need a backend and
-real accounts. The recommended path is **Firebase**:
-
-1. Create a free project at [Firebase Console](https://console.firebase.google.com/)
-   (this creates a Google Cloud project behind it).
-2. In Firebase, go to **Build → Authentication → Sign-in method** and
-   turn on **Google**.
-3. In **Project settings**, register a web app and copy the Firebase
-   config (apiKey, authDomain, projectId, and so on).
-4. In `app.js`, find `AUTH_CONFIG` at the top. It currently says:
-   ```js
-   const AUTH_CONFIG = {
-     googleClientId: "YOUR_GOOGLE_CLIENT_ID_HERE",
-     authProvider: "firebase",
-     enabled: false
-   };
-   ```
-   Replace `"YOUR_GOOGLE_CLIENT_ID_HERE"` with your real Google /
-   Firebase client ID, set `enabled: true`, and wire the
-   “Sign in with Google” button (currently disabled in `index.html`)
-   to Firebase Authentication. Then add a database (Firestore) so
-   circles, members, help requests, chat, and money are shared
-   instead of living in each person’s browser alone.
-
-No real credentials are included in this project — the placeholder
-above is the only place a client ID belongs, and only after you
-create your own Firebase project. **Never commit a real private key
-or service-account file to GitHub.**
+it can actually see — add Firestore in the same Firebase project,
+then move the localStorage save/load in `app.js` to read/write that
+circle in Firestore, keyed by the signed-in user.
 
 Alternative: Google Identity Services (Sign in with Google button)
 plus your own backend/database. Firebase is recommended first
@@ -128,8 +125,8 @@ HOSTING.md   — hosting comparison + GitHub Pages steps
 
 ## What’s NOT done yet
 
-- Real Google login (placeholder only — see above).
-- Shared backend / database — data is per-browser only for now.
+- Shared backend / database (Firestore) — Google sign-in is wired in,
+  but data is per-browser only for now.
 - Real invites (email / link) — adding a member is local-only.
 - Photo/video Stories — text updates only in this version.
 - No mobile app — this is a webapp on purpose, before any app work.

@@ -45,10 +45,12 @@
         </label>
         <button type="submit">Create my circle</button>
       </form>
+      <p class="small">Or sign up / sign in with Google first — your Google name will fill in below.</p>
+      <button id="googleBtnSetup" type="button">Sign in with Google</button>
       <p class="small">
         Saved only on this device / browser for now (localStorage).
         Each visitor starts with their own empty circle — nothing is shared yet.
-        Google login is the next step; see README.md.
+        You can sign in with Google once your circle is created — see the button in the app header.
       </p>
     </div>
   </main>
@@ -57,11 +59,12 @@
   <div id="appScreen" hidden>
     <div class="circle-bar">
       <p><strong id="circleTitle"></strong> <span id="circleKind" class="small"></span></p>
-      <p><strong>Signed in as:</strong> <span id="whoami"></span> <span class="small">(local profile — no real account yet)</span></p>
-      <!-- Google login is the NEXT step, not in this version.
-           See AUTH_CONFIG in app.js and the README for what is needed. -->
-      <button id="googleBtn" type="button" disabled title="Google login is not wired up in this version">
-        Sign in with Google (coming next)
+      <p><strong>Signed in as:</strong> <span id="whoami"></span> <span id="authStatus" class="small">(local profile — sign in with Google to use your Google account)</span></p>
+      <button id="googleBtn" type="button">
+        Sign in with Google
+      </button>
+      <button id="signOutBtn" type="button" hidden>
+        Sign out
       </button>
       <div class="actions">
         <button id="freshBtn" type="button">Delete circle &amp; start over</button>
@@ -195,12 +198,15 @@
 
   <footer>
     <p class="small">
-      Circall is a provisional working name. No real accounts, no shared
-      data, no real invites yet. See README.md for hosting and the
-      Google login next step.
+      Circall is a provisional working name. Google sign-in is wired to
+      the Firebase project for this app. Data is still saved per-browser
+      for now — shared circles need Firestore next. See README.md.
     </p>
   </footer>
 
+  <!-- Firebase (compat SDK, no build step) for Google sign-in -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

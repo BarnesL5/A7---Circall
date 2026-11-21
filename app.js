@@ -8,15 +8,79 @@
 //   app is interactive, but each visitor sees their OWN empty circle.
 // - Google login is NOT wired up here. See AUTH_CONFIG below.
 
-// --- Google login: placeholder only. Do NOT put a real key here. ---
-// Next step (see README.md): create a Firebase / Google Cloud project,
-// turn on Google sign-in, and paste the Client ID here. Until then the
-// "Sign in with Google" button in index.html stays disabled.
-const AUTH_CONFIG = {
-  googleClientId: "YOUR_GOOGLE_CLIENT_ID_HERE", // <-- replace later, after Firebase setup
-  authProvider: "firebase", // or "google-identity-services" — see README.md
-  enabled: false
+// --- Google login: Firebase Authentication ---
+// Firebase web config for project "a7---circall". This is the public
+// web config (not a private key) — it is meant to live in client code.
+// In Firebase Console, add your hosting domain to
+// Authentication > Settings > Authorized domains, e.g.
+// BarnesL5.github.io and localhost, or Google sign-in will be blocked.
+const firebaseConfig = {
+  apiKey: "AIzaSyCJHsJIk4jnIVr8HuxlckpCBqsT-VKlHVI",
+  authDomain: "a7---circall.firebaseapp.com",
+  projectId: "a7---circall",
+  storageBucket: "a7---circall.firebasestorage.app",
+  messagingSenderId: "249001053828",
+  appId: "1:249001053828:web:94b4994aade0ce5b447cd1",
+  measurementId: "G-TGN474ZGE6"
 };
+const AUTH_CONFIG = {
+  authProvider: "firebase",
+  enabled: true
+};
+
+let currentUser = null; // Firebase user, when signed in with Google
+
+function initAuth() {
+  try {
+    if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
+      if (typeof firebase !== "undefined") firebase.initializeApp(firebaseConfig);
+      else return; // SDK did not load (offline / file://) — local profile still works
+    }
+    firebase.auth().onAuthStateChanged(function (user) {
+      currentUser = user || null;
+      updateAuthUI();
+    });
+  } catch (e) { /* stay on local profile if Firebase cannot start */ }
+}
+
+function updateAuthUI() {
+  const btn = document.getElementById("googleBtn");
+  const outBtn = document.getElementById("signOutBtn");
+  const status = document.getElementById("authStatus");
+  if (!btn) return;
+  if (currentUser) {
+    btn.hidden = true;
+    if (outBtn) outBtn.hidden = false;
+    if (status) status.textContent = "(signed in with Google as " + (currentUser.email || currentUser.displayName || "") + ")";
+    const setupName = document.getElementById("setupYourName");
+    if (setupName && !setupName.value && currentUser.displayName) setupName.value = currentUser.displayName;
+    // Use the Google name for new chat/check-in posts if no local name was set.
+    if (!state.you && currentUser.displayName) {
+      state.you = currentUser.displayName;
+      const who = document.getElementById("whoami");
+      if (who) who.textContent = state.you;
+    }
+  } else {
+    btn.hidden = false;
+    if (outBtn) outBtn.hidden = true;
+    if (status) status.textContent = "(local profile — sign in with Google to use your Google account)";
+  }
+}
+
+function signInWithGoogle() {
+  if (typeof firebase === "undefined" || !firebase.auth) {
+    alert("Google sign-in could not load. Check your connection and try again on the hosted site (not a downloaded file).");
+    return;
+  }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).catch(function (err) {
+    alert("Google sign-in failed: " + (err && err.message ? err.message : err) + "\nIf it says unauthorized domain, add this site's domain in Firebase Console > Authentication > Settings > Authorized domains.");
+  });
+}
+
+function signOutGoogle() {
+  if (typeof firebase !== "undefined" && firebase.auth) firebase.auth().signOut();
+}
 
 const STORAGE_KEY = "circall-webapp-v1";
 
@@ -356,5 +420,13 @@ document.getElementById("freshBtn").addEventListener("click", function () {
   }
 });
 
+// --- Google sign-in buttons ---
+document.getElementById("googleBtn").addEventListener("click", signInWithGoogle);
+document.getElementById("signOutBtn").addEventListener("click", signOutGoogle);
+const setupGoogleBtn = document.getElementById("googleBtnSetup");
+if (setupGoogleBtn) setupGoogleBtn.addEventListener("click", signInWithGoogle);
+
 // First paint: setup screen if no circle yet, otherwise the app.
 showScreen();
+initAuth();
+updateAuthUI();
