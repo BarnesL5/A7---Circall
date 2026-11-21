@@ -24,8 +24,8 @@
     <div class="card setup-card">
       <h2>Create your circle</h2>
       <p class="hint">
-        Start empty. Give your circle a name, say what kind it is,
-        and add yourself first — then invite your people.
+        Your circle starts empty. Give it a name, say what kind it is,
+        and add yourself first — then bring your people in.
       </p>
       <form id="setupForm">
         <label>
@@ -43,24 +43,25 @@
           Your name
           <input id="setupYourName" type="text" placeholder="Your name" required>
         </label>
-        <button type="submit">Create my circle (on this device only)</button>
+        <button type="submit" class="primary">Create my circle</button>
       </form>
-      <p class="small">Or sign up / sign in with Google first — your Google name will fill in below.</p>
-      <button id="googleBtnSetup" type="button">Sign in with Google</button>
+      <p class="small">Only on this device — just for you, for now.</p>
+      <p class="small">Or sign in with Google first — your name will fill in below, and you can share your circle later.</p>
+      <button id="googleBtnSetup" type="button" class="google-btn">Sign in with Google</button>
     </div>
 
     <div class="card setup-card">
       <h2>Share with your family / group</h2>
       <p class="hint">
-        A shared circle lives in Firestore, so everyone who joins it
-        sees the same members, help board, chat and money — live.
-        Everyone signs in with Google.
+        A shared circle is one everyone in it can see — the same members,
+        help board, chat and money, updated live. Everyone signs in
+        with Google.
       </p>
       <p class="small">
         Fill in the circle name, kind and your name above, then tap
         “Create a shared circle”. You will get an invite code to share.
       </p>
-      <button id="createSharedBtn" type="button">Create a shared circle</button>
+      <button id="createSharedBtn" type="button" class="primary">Create a shared circle</button>
       <p id="sharedMsg" class="small"></p>
 
       <h3>Join a shared circle</h3>
@@ -68,19 +69,18 @@
       <form id="joinForm">
         <input id="joinCode" type="text" placeholder="Invite code, e.g. ABC123" required>
         <input id="joinName" type="text" placeholder="Your name" required>
-        <button type="submit">Join a shared circle</button>
+        <button type="submit" class="primary">Join a shared circle</button>
       </form>
       <p id="joinMsg" class="small"></p>
     </div>
 
     <div class="card setup-card">
       <p class="small">
-        <strong>On this device only</strong> means the circle is saved
-        in this browser only (localStorage). Nobody else sees it.
-        <strong>Shared</strong> means it is saved in Firestore and
-        everyone who joins with the invite code sees the same circle.
-        If you are not signed in, or Firestore is not set up yet,
-        the app falls back to “on this device only”.
+        <strong>Only on this device</strong> means the circle lives in
+        this browser only. Nobody else sees it.
+        <strong>Shared</strong> means everyone who joins with the invite
+        code sees the same circle. If you are not signed in, your circle
+        stays on this device.
       </p>
     </div>
   </main>
@@ -90,19 +90,19 @@
     <div class="circle-bar">
       <p><strong id="circleTitle"></strong> <span id="circleKind" class="small"></span> <span id="modeBadge" class="mode-badge mode-local">On this device only</span></p>
       <p id="inviteCodeBox" class="small" hidden>Invite code: <strong id="inviteCodeText"></strong> <button id="copyInviteBtn" type="button" class="small-btn">Copy invite code</button></p>
-      <p id="modeNote" class="small">Saved in this browser only. Sign in with Google to share this circle.</p>
-      <p><strong>Signed in as:</strong> <span id="whoami"></span> <span id="authStatus" class="small">(local profile — sign in with Google to use your Google account)</span></p>
-      <button id="googleBtn" type="button">
+      <p id="modeNote" class="small">Only on this device. Sign in with Google to share this circle.</p>
+      <p><strong>Signed in as:</strong> <span id="whoami"></span> <span id="authStatus" class="small">(Not signed in — sign in with Google to share your circle)</span></p>
+      <button id="googleBtn" type="button" class="google-btn">
         Sign in with Google
       </button>
-      <button id="signOutBtn" type="button" hidden>
+      <button id="signOutBtn" type="button" class="secondary" hidden>
         Sign out
       </button>
-      <button id="shareLocalBtn" type="button" hidden>
+      <button id="shareLocalBtn" type="button" class="secondary" hidden>
         Share this circle
       </button>
       <div class="actions">
-        <button id="freshBtn" type="button">Delete circle &amp; start over</button>
+        <button id="freshBtn" type="button" class="secondary">Delete circle &amp; start over</button>
       </div>
     </div>
 
@@ -128,7 +128,7 @@
         <div id="members"></div>
 
         <h3>Add a member</h3>
-        <p class="small" id="inviteHint">No real invite is sent yet — adding a member adds them to this circle right away, on this device.</p>
+        <p class="small" id="inviteHint">Add them here for now — they'll join this circle right away.</p>
         <form id="inviteForm">
           <input id="inviteName" type="text" placeholder="Name, e.g. Jordan" required>
           <select id="inviteRole">
@@ -193,7 +193,7 @@
         </form>
 
         <h2>Stories</h2>
-        <p class="hint">Casual text updates to the circle. Photo / video upload is not in this version yet.</p>
+        <p class="hint">Casual text updates to the circle. Text updates for now.</p>
         <div id="stories"></div>
         <form id="storyForm">
           <input id="storyInput" type="text" placeholder="Share a quick update…" required>
@@ -204,7 +204,7 @@
       <!-- 6. MONEY -->
       <section id="tab-money" class="tab">
         <h2>Money log</h2>
-        <p class="hint">A simple shared log / split. No bank connections in v1.</p>
+        <p class="hint">A simple shared log and even split — no bank accounts, just what the circle records here.</p>
         <div id="moneySummary"></div>
         <div id="moneyLog"></div>
         <h3>Add an expense</h3>
@@ -233,14 +233,13 @@
 
   <footer>
     <p class="small">
-      Circall is a provisional working name. Google sign-in is wired to
-      the Firebase project for this app. Shared circles use Firestore —
-      see README.md. If you are not signed in, or Firestore is not set
-      up yet, the app saves on this device only.
+      Circall is a work in progress — a friendly place for one family
+      or group to coordinate everyday life. Sign in with Google to
+      share your circle with others.
     </p>
   </footer>
 
-  <!-- Firebase (compat SDK, no build step) for Google sign-in + Firestore -->
+  <!-- Firebase (compat SDK, no build step) for Google sign-in + shared circles -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>

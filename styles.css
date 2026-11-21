@@ -1,183 +1,281 @@
-/* Circall demo — simple, readable styles. No build step needed. */
+/* Circall — warm, friendly theme. System fonts only, no build step. */
 
 * { box-sizing: border-box; }
+
+:root {
+  --bg: #faf6ef;          /* warm cream page background */
+  --card: #ffffff;
+  --ink: #2b2430;         /* warm dark plum-charcoal */
+  --muted: #6b5f6e;
+  --line: #e9e1d2;        /* warm sand border */
+  --brand: #8f2ec7;       /* main purple — header, buttons, active tab */
+  --brand-deep: #6b1f9e;  /* deep purple for the header gradient */
+  --brand-soft: #f3e8fb;  /* pale purple tint */
+  --accent: #8f2ec7;      /* primary buttons use the main purple */
+  --accent-hover: #7a24ad;
+  --accent-soft: #f3e8fb;
+  --gold: #f2c98a;        /* tagline accent — readable on purple */
+  --green: #2e7d5b;       /* shared / success only */
+  --red: #c0453e;
+  --radius: 16px;
+  --shadow: 0 2px 10px rgba(43, 36, 48, 0.07);
+}
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   margin: 0;
-  background: #f6f4ef;
-  color: #222;
-  line-height: 1.5;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
 }
 
+/* ---------- Header ---------- */
 .top {
-  background: #1f3a5f;
+  background: linear-gradient(135deg, var(--brand-deep), #a04fd0);
   color: #fff;
-  padding: 24px 20px;
+  padding: 32px 20px 28px;
 }
 
-.top h1 { margin: 0 0 4px; font-size: 2rem; }
-.tagline { margin: 0 0 8px; font-style: italic; opacity: 0.9; }
-.intro { max-width: 640px; margin: 0 0 16px; }
+.top h1 { margin: 0 0 4px; font-size: 2.1rem; letter-spacing: -0.01em; }
+.tagline { margin: 0 0 10px; font-style: italic; color: var(--gold); font-size: 1.05rem; }
+.intro { max-width: 640px; margin: 0; color: rgba(255, 255, 255, 0.92); }
 
-/* First screen: create your circle. */
+/* ---------- First screen: create your circle ---------- */
 .setup {
-  max-width: 560px;
+  max-width: 580px;
   margin: 0 auto;
-  padding: 24px 16px 40px;
+  padding: 28px 16px 48px;
 }
 
 .setup-card form { flex-direction: column; }
-.setup-card label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.setup-card label { display: flex; flex-direction: column; gap: 5px; font-weight: 600; }
 .setup-card input, .setup-card select { width: 100%; }
+.setup-card h2 { margin-top: 4px; }
+.setup-card h3 { margin-bottom: 4px; }
 
-/* Bar shown above the tabs once a circle exists. */
+/* ---------- Bar shown above the tabs once a circle exists ---------- */
 .circle-bar {
-  background: #fff;
-  border-bottom: 1px solid #ddd;
-  padding: 12px 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
 }
 
-.circle-bar p { margin: 4px 0; }
+.circle-bar p { margin: 5px 0; }
 .circle-bar button[disabled] { opacity: 0.65; cursor: not-allowed; }
 
-/* Shared vs on-this-device-only badge in the app header. */
+/* Shared vs only-on-this-device badge in the app header. */
 .mode-badge {
   display: inline-block;
   font-size: 0.8rem;
   font-weight: 700;
   border-radius: 999px;
-  padding: 2px 8px;
+  padding: 3px 10px;
   margin-left: 6px;
+  vertical-align: middle;
 }
-.mode-badge.mode-local { background: #e6e2d8; color: #555; }
-.mode-badge.mode-shared { background: #2e7d5b; color: #fff; }
+.mode-badge.mode-local { background: #efe7d8; color: #6b5a3e; }
+.mode-badge.mode-shared { background: var(--green); color: #fff; }
 
 #inviteCodeBox { font-size: 0.95rem; }
+#inviteCodeText {
+  background: var(--brand-soft);
+  border-radius: 8px;
+  padding: 2px 8px;
+  letter-spacing: 0.08em;
+  font-size: 1.05rem;
+}
 
-main { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
+main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
 
+/* ---------- Tabs (sticky) ---------- */
 .tabs {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   padding: 12px 16px;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(43, 36, 48, 0.06);
 }
 
 .tabs button {
-  border: 1px solid #ccc;
-  background: #f0ede6;
+  border: 1px solid var(--line);
+  background: #f3eee2;
+  color: var(--ink);
   border-radius: 999px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   cursor: pointer;
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
+.tabs button:hover { background: #ece4d2; }
+
 .tabs button.active {
-  background: #1f3a5f;
+  background: var(--brand);
   color: #fff;
-  border-color: #1f3a5f;
+  border-color: var(--brand);
 }
 
 .badge {
-  background: #d64545;
+  background: var(--red);
   color: #fff;
   border-radius: 999px;
   padding: 0 7px;
   font-size: 0.8rem;
 }
 
-main { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
-
 .tab { display: none; }
 .tab.active { display: block; }
 
-h2 { margin-top: 8px; }
-h3 { margin-top: 24px; }
-.hint { color: #555; }
-.small { font-size: 0.85rem; color: #555; }
+h2 { margin-top: 8px; font-size: 1.45rem; }
+h3 { margin-top: 28px; }
+.hint { color: var(--muted); }
+.small { font-size: 0.85rem; color: var(--muted); }
 .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* ---------- Cards ---------- */
 .card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
 }
 
 .card h3, .card h4 { margin: 0 0 4px; }
 .card p { margin: 4px 0; }
 
-.toggles { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.9rem; }
-.toggles label { display: flex; gap: 4px; align-items: center; }
+.toggles { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.9rem; }
+.toggles label { display: flex; gap: 5px; align-items: center; font-weight: 400; }
+.toggles input { accent-color: var(--brand); }
 
+/* ---------- Forms & buttons ---------- */
 form {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 input, select, button {
   font: inherit;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #bbb;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #c9c0ab;
 }
 
-input, select { flex: 1 1 160px; background: #fff; }
+input, select { flex: 1 1 160px; background: #fff; color: var(--ink); }
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(143, 46, 199, 0.18);
+}
 
 button {
-  background: #1f3a5f;
+  background: var(--brand);
   color: #fff;
-  border-color: #1f3a5f;
+  border-color: var(--brand);
   cursor: pointer;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 10px 18px;
+  transition: background 0.15s ease, transform 0.05s ease;
 }
+
+button:hover { background: #7a24ad; }
+button:active { transform: scale(0.98); }
+
+button:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Primary call-to-action: the main purple, stands out on the warm cream. */
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+button.primary:hover { background: var(--accent-hover); }
+
+/* Google sign-in: white button, dark text. */
+button.google-btn {
+  background: #fff;
+  color: var(--ink);
+  border-color: #c9c0ab;
+}
+button.google-btn:hover { background: #f3eee2; }
 
 button.secondary {
   background: #fff;
-  color: #1f3a5f;
-  border-color: #1f3a5f;
+  color: var(--brand);
+  border-color: var(--brand);
 }
+button.secondary:hover { background: var(--brand-soft); }
 
-button.small-btn { padding: 4px 8px; font-size: 0.85rem; }
+button.small-btn { padding: 5px 10px; font-size: 0.85rem; }
 
 .part {
   display: flex;
   justify-content: space-between;
   gap: 8px;
   align-items: center;
-  border-top: 1px solid #eee;
-  padding: 6px 0;
+  border-top: 1px solid #f0eadd;
+  padding: 8px 0;
 }
 
-.part.done { color: #555; text-decoration: line-through; }
+.part.done { color: var(--muted); text-decoration: line-through; }
 
 .chat-log {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
   min-height: 120px;
+  box-shadow: var(--shadow);
 }
 
 .chat-log p { margin: 6px 0; }
 
 .progress {
   height: 10px;
-  background: #e6e2d8;
+  background: #ece5d6;
   border-radius: 999px;
   overflow: hidden;
 }
 
 .progress > div {
   height: 100%;
-  background: #2e7d5b;
+  background: var(--green);
 }
 
-footer { max-width: 760px; margin: 0 auto; padding: 0 16px 32px; }
+footer { max-width: 760px; margin: 0 auto; padding: 0 16px 36px; text-align: center; }
+
+/* ---------- Phone widths ---------- */
+@media (max-width: 640px) {
+  .top { padding: 24px 16px 22px; }
+  .top h1 { font-size: 1.8rem; }
+  .setup { padding: 20px 14px 40px; }
+  main { padding: 18px 14px 40px; }
+
+  /* Tabs scroll sideways instead of wrapping into a tall stack. */
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 12px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { flex: 0 0 auto; }
+
+  .card { padding: 14px 15px; }
+  form { flex-direction: column; }
+  form input, form select, form button { width: 100%; flex: none; }
+  .part { flex-direction: column; align-items: flex-start; }
+}

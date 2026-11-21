@@ -79,8 +79,7 @@ function updateAuthUI() {
   if (currentUser) {
     btn.hidden = true;
     if (outBtn) outBtn.hidden = false;
-    if (status) status.textContent = "(signed in with Google as " + (currentUser.email || currentUser.displayName || "") + ")";
-    const setupName = document.getElementById("setupYourName");
+    if (status) status.textContent = "(signed in with Google as " + (currentUser.email || currentUser.displayName || "") + ")";    const setupName = document.getElementById("setupYourName");
     if (setupName && !setupName.value && currentUser.displayName) setupName.value = currentUser.displayName;
     // Use the Google name for new chat/check-in posts if no local name was set.
     if (!state.you && currentUser.displayName) {
@@ -91,18 +90,19 @@ function updateAuthUI() {
   } else {
     btn.hidden = false;
     if (outBtn) outBtn.hidden = true;
-    if (status) status.textContent = "(local profile — sign in with Google to use your Google account)";
+    if (status) status.textContent = "(Not signed in — sign in with Google to share your circle)";
   }
 }
 
 function signInWithGoogle() {
   if (typeof firebase === "undefined" || !firebase.auth) {
-    alert("Google sign-in could not load. Check your connection and try again on the hosted site (not a downloaded file).");
+    alert("Google sign-in couldn't load. Check your connection and try again.");
     return;
   }
   const provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider).catch(function (err) {
-    alert("Google sign-in failed: " + (err && err.message ? err.message : err) + "\nIf it says unauthorized domain, add this site's domain in Firebase Console > Authentication > Settings > Authorized domains.");
+    console.error("Google sign-in failed:", err);
+    alert("Google sign-in didn't work. Please try again.");
   });
 }
 
@@ -350,15 +350,15 @@ function updateModeUI() {
   if (codeEl && isShared) codeEl.textContent = state.circle.inviteCode;
   if (note) {
     note.textContent = isShared
-      ? "Shared circle — everyone who joins with the invite code sees the same circle, live."
-      : "Saved in this browser only. Sign in with Google to share this circle.";
+      ? "Shared — everyone in your circle sees the same thing, live."
+      : "Only on this device. Sign in with Google to share this circle.";
   }
   // "Share this circle" only makes sense when signed in and local-only.
   if (shareBtn) shareBtn.hidden = !(currentUser && state.circle && !isShared);
   if (hint) {
     hint.textContent = isShared
       ? "Share the invite code (above) with your people. They sign in with Google and join with that code."
-      : "No real invite is sent yet — adding a member adds them to this circle right away, on this device.";
+      : "Add them here for now — they'll join this circle right away.";
   }
 }
 
@@ -392,7 +392,8 @@ document.getElementById("setupForm").addEventListener("submit", function (e) {
 // Firebase Console), they say so plainly and fall back to local.
 function firestoreReady() {
   if (!db) {
-    alert("Firestore is not ready. First create the database in Firebase Console > Build > Firestore Database > Create database (see README.md), then reload this page.");
+    console.error("Sharing is not ready: Firestore is not available.");
+    alert("Sharing isn't available right now. Your circle will stay on this device for now — please try again later.");
     return false;
   }
   return true;
@@ -451,7 +452,8 @@ function createSharedCircle() {
     showScreen();
     if (msg) msg.textContent = "Shared circle created. Invite code: " + inviteCode + " — share it with your people.";
   }).catch(function (err) {
-    if (msg) msg.textContent = "Could not create the shared circle: " + (err && err.message ? err.message : err);
+    console.error("Could not create the shared circle:", err);
+    if (msg) msg.textContent = "Sorry, we couldn't create the shared circle. Please try again.";
   });
 }
 
@@ -505,7 +507,8 @@ function joinSharedCircle(code, yourName) {
     if (msg) msg.textContent = "Joined “" + state.circle.name + "”.";
     return true;
   }).catch(function (err) {
-    if (msg) msg.textContent = "Could not join: " + (err && err.message ? err.message : err);
+    console.error("Could not join the shared circle:", err);
+    if (msg) msg.textContent = "Sorry, we couldn't join that circle. Check the code and try again.";
     return false;
   });
 }
@@ -532,7 +535,8 @@ function shareLocalCircle() {
     showScreen();
     alert("This circle is now shared. Invite code: " + inviteCode + " — share it with your people.");
   }).catch(function (err) {
-    alert("Could not share this circle: " + (err && err.message ? err.message : err));
+    console.error("Could not share this circle:", err);
+    alert("Sorry, we couldn't share this circle. Please try again.");
   });
 }
 
@@ -549,15 +553,14 @@ function renderMembers() {
           '> Share ' + key + '</label>';
       }).join("") +
       '</div></div>';
-  }).join("") : "<p>No members yet — add your first member below.</p>";
-}
+  }).join("") : "<p>No members yet — add your first member below.</p>";}
 
 function renderAvailability() {
   const el = document.getElementById("availability");
   el.innerHTML = state.availability.length ? state.availability.map(function (a) {
     return '<div class="card"><strong>' + esc(a.who) + '</strong> — ' + esc(a.when) +
       '<br>' + esc(a.note || "") + '</div>';
-  }).join("") : "<p>No availability shared yet.</p>";
+  }).join("") : "<p>Nothing shared yet — add when you're free below.</p>";
 }
 
 function unclaimedCount() {
@@ -588,7 +591,7 @@ function renderHelp() {
         return '<div class="part' + (p.done ? " done" : "") + '"><span>' + esc(p.label) +
           ' — ' + status + '</span><span>' + btns + '</span></div>';
       }).join("") + '</div>';
-  }).join("") : "<p>No help requests yet. Post one below.</p>";
+  }).join("") : "<p>No help requests yet — post the first one below.</p>";
 }
 
 function renderChat() {
@@ -596,7 +599,7 @@ function renderChat() {
     ? state.messages.map(function (m) {
         return "<p><strong>" + esc(m.who) + ":</strong> " + esc(m.text) + "</p>";
       }).join("")
-    : "<p>No messages yet.</p>";
+    : "<p>No messages yet — say hello to your circle.</p>";
 }
 
 function renderCheckins() {
@@ -605,12 +608,12 @@ function renderCheckins() {
         return '<div class="card"><strong>' + esc(c.who) + '</strong> is at ' + esc(c.where) +
           ' <span class="small">(' + esc(c.when) + ')</span></div>';
       }).join("")
-    : "<p>No check-ins yet.</p>";
+    : "<p>No check-ins yet — let the circle know where you are.</p>";
   document.getElementById("stories").innerHTML = state.stories.length
     ? state.stories.map(function (s) {
         return '<div class="card"><strong>' + esc(s.who) + '</strong><p>' + esc(s.text) + '</p></div>';
       }).join("")
-    : "<p>No Stories yet.</p>";
+    : "<p>No Stories yet — share a quick update below.</p>";
 }
 
 function renderMoney() {
@@ -624,7 +627,7 @@ function renderMoney() {
         return '<div class="card">' + esc(m.what) + ' — <strong>' + money(m.amount) +
           '</strong> <span class="small">paid by ' + esc(m.paidBy) + '</span></div>';
       }).join("")
-    : "<p>No money entries yet.</p>";
+    : "<p>No expenses yet — add the first one below.</p>";
 }
 
 function renderGoals() {
@@ -636,7 +639,7 @@ function renderGoals() {
           '<div class="progress"><div style="width:' + pct + '%"></div></div>' +
           '<p><button type="button" class="small-btn" data-goal-plus="' + g.id + '">+1 progress</button></p></div>';
       }).join("")
-    : "<p>No goals yet.</p>";
+    : "<p>No goals yet — add something to work toward together.</p>";
 }
 
 function renderAll() {

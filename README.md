@@ -168,6 +168,38 @@ README.md       — this file
 HOSTING.md      — hosting comparison + GitHub Pages steps
 ```
 
+## For the builder (not shown in the app)
+
+The screens people see never mention Firestore, Firebase, localStorage,
+authorized domains, or security rules — that wording lives here and in
+code comments, so people trying the app just see plain language
+(“Shared”, “Only on this device”, “Sign in with Google”).
+
+The technical summary, for the person setting it up:
+
+- **Firebase project:** `a7---circall`. Google sign-in uses Firebase
+  Authentication (Google provider); the public web config lives in
+  `app.js` (`firebaseConfig`). Sign-in only works from domains listed
+  under **Authentication → Settings → Authorized domains** (e.g.
+  `BarnesL5.github.io`, plus `localhost` for local testing), and
+  Google must stay enabled under **Authentication → Sign-in method**.
+- **Shared circles:** one document per circle in the Firestore
+  `circles` collection, with live updates via `onSnapshot`. Writes are
+  debounced and guarded against echo loops (see `applyingRemote` in
+  `app.js`). The database must be created once in Firebase Console
+  (**Build → Firestore Database → Create database**, test mode to
+  start) — see “Shared circles” above.
+- **Local-only circles:** saved in this browser in localStorage under
+  the key `circall-webapp-v1`. Which shared circle this browser is
+  attached to is stored separately under `circall-webapp-shared-v1`.
+  A shared circle is also saved locally, so the app still opens with
+  the last seen data if the shared copy can't be reached.
+- **Rules:** `firestore.rules` allows read/write only for signed-in
+  users (`request.auth != null`). That is a starter rule — it is
+  **not** production-secure, because it does not check membership of
+  that circle. Tighten it to members-only before real family use
+  (see the comments in `firestore.rules`).
+
 ## What’s NOT done yet
 
 - Members-only Firestore rules — the rules now allow any signed-in
